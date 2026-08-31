@@ -1,124 +1,167 @@
+// ========================================
 // LVN.HUB PRO
-// Frontend demo only.
-// For a real public site, authentication and code storage
-// should be handled by a secure backend.
+// ========================================
 
-const USER = {
-    username: "LVN.HUB",
-    password: "LAVAN KOUSHIK 31"
-};
+// DEMO LOGIN DETAILS
+const USER_USERNAME = "LVN.HUB";
+const USER_PASSWORD = "LAVAN KOUSHIK 31";
 
-const ADMIN = {
-    username: "LVN.ADMIN",
-    password: "LAVANKOUSHIK41"
-};
+const ADMIN_USERNAME = "LVN.ADMIN";
+const ADMIN_PASSWORD = "LAVANKOUSHIK41";
 
-// -------------------------
-// PAGE HELPERS
-// -------------------------
 
-function hideAllPages() {
-    document.querySelectorAll(".page").forEach(page => {
+// ========================================
+// PAGE CONTROL
+// ========================================
+
+function showPage(pageId) {
+
+    const pages = document.querySelectorAll(".page");
+
+    pages.forEach(function(page) {
         page.classList.add("hidden");
     });
-}
 
-function showPage(id) {
-    hideAllPages();
-    document.getElementById(id).classList.remove("hidden");
-}
+    const selectedPage = document.getElementById(pageId);
 
-// -------------------------
-// USER LOGIN
-// -------------------------
-
-document.getElementById("loginForm").addEventListener("submit", function(event) {
-
-    event.preventDefault();
-
-    const username =
-        document.getElementById("username").value.trim();
-
-    const password =
-        document.getElementById("password").value;
-
-    const message =
-        document.getElementById("loginMessage");
-
-    if (
-        username === USER.username &&
-        password === USER.password
-    ) {
-
-        sessionStorage.setItem("LVN_SESSION", "user");
-
-        message.textContent = "";
-
-        showPage("dashboardPage");
-
-    } else {
-
-        message.textContent =
-            "Invalid username or password.";
-
+    if (selectedPage) {
+        selectedPage.classList.remove("hidden");
     }
+}
 
-});
 
-// -------------------------
-// ADMIN LOGIN
-// -------------------------
+// ========================================
+// USER LOGIN
+// ========================================
+
+document
+    .getElementById("loginForm")
+    .addEventListener("submit", function(event) {
+
+        event.preventDefault();
+
+        const username =
+            document.getElementById("username").value.trim();
+
+        const password =
+            document.getElementById("password").value;
+
+        const message =
+            document.getElementById("loginMessage");
+
+
+        if (
+            username === USER_USERNAME &&
+            password === USER_PASSWORD
+        ) {
+
+            sessionStorage.setItem(
+                "LVN_SESSION",
+                "user"
+            );
+
+            message.textContent = "";
+
+            showPage("dashboardPage");
+
+        } else {
+
+            message.textContent =
+                "Invalid username or password.";
+
+        }
+
+    });
+
+
+// ========================================
+// SHOW ADMIN LOGIN
+// ========================================
 
 function showAdminLogin() {
 
     showPage("adminLoginPage");
 
+    const message =
+        document.getElementById("adminMessage");
+
+    if (message) {
+        message.textContent = "";
+    }
+
 }
+
+
+// ========================================
+// BACK TO USER LOGIN
+// ========================================
 
 function showUserLogin() {
 
     showPage("loginPage");
 
-}
-
-document.getElementById("adminForm").addEventListener("submit", function(event) {
-
-    event.preventDefault();
-
-    const username =
-        document.getElementById("adminUsername").value.trim();
-
-    const password =
-        document.getElementById("adminPassword").value;
-
     const message =
-        document.getElementById("adminMessage");
+        document.getElementById("loginMessage");
 
-    if (
-        username === ADMIN.username &&
-        password === ADMIN.password
-    ) {
-
-        sessionStorage.setItem("LVN_SESSION", "admin");
-
+    if (message) {
         message.textContent = "";
-
-        showPage("adminPage");
-
-        refreshCodes();
-
-    } else {
-
-        message.textContent =
-            "Invalid admin credentials.";
-
     }
 
-});
+}
 
-// -------------------------
+
+// ========================================
+// ADMIN LOGIN
+// ========================================
+
+document
+    .getElementById("adminForm")
+    .addEventListener("submit", function(event) {
+
+        event.preventDefault();
+
+        const username =
+            document
+                .getElementById("adminUsername")
+                .value
+                .trim();
+
+        const password =
+            document.getElementById("adminPassword").value;
+
+        const message =
+            document.getElementById("adminMessage");
+
+
+        if (
+            username === ADMIN_USERNAME &&
+            password === ADMIN_PASSWORD
+        ) {
+
+            sessionStorage.setItem(
+                "LVN_SESSION",
+                "admin"
+            );
+
+            message.textContent = "";
+
+            showPage("adminPage");
+
+            refreshCodes();
+
+        } else {
+
+            message.textContent =
+                "Invalid admin username or password.";
+
+        }
+
+    });
+
+
+// ========================================
 // LOGOUT
-// -------------------------
+// ========================================
 
 function logout() {
 
@@ -128,17 +171,27 @@ function logout() {
 
 }
 
-// -------------------------
+
+// ========================================
 // CODE STORAGE
-// -------------------------
+// ========================================
 
 function getCodes() {
 
-    return JSON.parse(
-        localStorage.getItem("LVN_CODES") || "[]"
-    );
+    try {
+
+        return JSON.parse(
+            localStorage.getItem("LVN_CODES") || "[]"
+        );
+
+    } catch (error) {
+
+        return [];
+
+    }
 
 }
+
 
 function saveCodes(codes) {
 
@@ -149,19 +202,25 @@ function saveCodes(codes) {
 
 }
 
-// -------------------------
-// ADMIN: ADD CODE
-// -------------------------
+
+// ========================================
+// ADMIN - ADD CODE
+// ========================================
 
 function addCode() {
 
     const input =
         document.getElementById("newCode");
 
+    if (!input) {
+        return;
+    }
+
     const code =
         input.value.trim();
 
-    if (!code) {
+
+    if (code === "") {
 
         alert("Please enter a code.");
 
@@ -169,7 +228,9 @@ function addCode() {
 
     }
 
+
     const codes = getCodes();
+
 
     codes.push({
 
@@ -177,9 +238,11 @@ function addCode() {
 
         status: "AVAILABLE",
 
-        created: new Date().toLocaleString()
+        createdAt:
+            new Date().toLocaleString()
 
     });
+
 
     saveCodes(codes);
 
@@ -189,18 +252,23 @@ function addCode() {
 
 }
 
-// -------------------------
-// ADMIN: VIEW CODES
-// -------------------------
+
+// ========================================
+// ADMIN - DISPLAY CODES
+// ========================================
 
 function refreshCodes() {
 
     const list =
         document.getElementById("codeList");
 
-    if (!list) return;
+    if (!list) {
+        return;
+    }
+
 
     const codes = getCodes();
+
 
     if (codes.length === 0) {
 
@@ -211,46 +279,99 @@ function refreshCodes() {
 
     }
 
-    list.innerHTML = codes.map((item, index) => {
 
-        return `
-            <div class="code-display">
+    list.innerHTML = "";
 
-                <div>${escapeHTML(item.code)}</div>
 
-                <small>
-                    Status:
-                    ${escapeHTML(item.status)}
-                </small>
+    codes.forEach(function(item, index) {
 
-                <br><br>
+        const wrapper =
+            document.createElement("div");
 
-                <button
-                    onclick="deleteCode(${index})"
-                    style="
-                        background:#ff405d;
-                        color:white;
-                        padding:10px 15px;
-                        border-radius:8px;
-                    "
-                >
-                    DELETE
-                </button>
+        wrapper.className =
+            "code-display";
 
-            </div>
-        `;
 
-    }).join("");
+        const codeText =
+            document.createElement("div");
+
+        codeText.textContent =
+            item.code;
+
+
+        const status =
+            document.createElement("small");
+
+        status.textContent =
+            "Status: " + item.status;
+
+
+        const deleteButton =
+            document.createElement("button");
+
+        deleteButton.textContent =
+            "DELETE";
+
+
+        deleteButton.style.background =
+            "#ff405d";
+
+        deleteButton.style.color =
+            "#ffffff";
+
+        deleteButton.style.padding =
+            "10px 15px";
+
+        deleteButton.style.borderRadius =
+            "8px";
+
+        deleteButton.style.marginTop =
+            "12px";
+
+
+        deleteButton.onclick =
+            function() {
+
+                deleteCode(index);
+
+            };
+
+
+        wrapper.appendChild(codeText);
+
+        wrapper.appendChild(status);
+
+        wrapper.appendChild(
+            document.createElement("br")
+        );
+
+        wrapper.appendChild(deleteButton);
+
+        list.appendChild(wrapper);
+
+    });
 
 }
 
-// -------------------------
-// ADMIN: DELETE CODE
-// -------------------------
+
+// ========================================
+// ADMIN - DELETE CODE
+// ========================================
 
 function deleteCode(index) {
 
     const codes = getCodes();
+
+
+    if (
+        index < 0 ||
+        index >= codes.length
+    ) {
+
+        return;
+
+    }
+
 
     codes.splice(index, 1);
 
@@ -260,79 +381,103 @@ function deleteCode(index) {
 
 }
 
-// -------------------------
-// USER: GENERATE CODE
-// -------------------------
+
+// ========================================
+// USER - GENERATE CODE
+// ========================================
 
 function generateCode() {
-
-    const codes = getCodes();
-
-    const available =
-        codes.find(
-            item => item.status === "AVAILABLE"
-        );
 
     const box =
         document.getElementById("contentBox");
 
-    if (!available) {
+    if (!box) {
+        return;
+    }
+
+
+    const codes = getCodes();
+
+
+    const availableCode =
+        codes.find(function(item) {
+
+            return item.status === "AVAILABLE";
+
+        });
+
+
+    if (!availableCode) {
 
         box.innerHTML = `
-            <h2>No Code Available</h2>
+
+            <h2>🔒 No Code Available</h2>
 
             <p>
-                There are currently no available
-                administrator-provided codes.
+                No administrator-provided code
+                is currently available.
             </p>
+
         `;
 
         return;
 
     }
 
-    // Mark code as used.
 
-    available.status = "USED";
+    // Mark the selected code as USED.
 
-    available.usedAt =
+    availableCode.status =
+        "USED";
+
+    availableCode.usedAt =
         new Date().toLocaleString();
+
 
     saveCodes(codes);
 
+
     box.innerHTML = `
+
         <h2>🔑 Your Code</h2>
 
         <div class="code-display">
-            ${escapeHTML(available.code)}
+            ${escapeHTML(availableCode.code)}
         </div>
 
         <p>
-            This code has been marked as
-            <strong>USED</strong>.
+            This code has been marked as USED.
         </p>
+
     `;
 
 }
 
-// -------------------------
+
+// ========================================
 // WHAT'S THE USE?
-// -------------------------
+// ========================================
 
 function showUse() {
 
     const box =
         document.getElementById("contentBox");
 
+    if (!box) {
+        return;
+    }
+
+
     box.innerHTML = `
 
         <h2>📖 What's the Use?</h2>
 
         <p>
-            LVN.HUB PRO uses administrator-managed
-            access codes for controlled access to
-            your own services, projects, or
-            cybersecurity learning resources.
+            LVN.HUB PRO uses
+            administrator-managed access codes
+            for controlled access to your own
+            services, projects, or cybersecurity
+            learning resources.
         </p>
 
         <br>
@@ -347,21 +492,27 @@ function showUse() {
 
         <p>
             Once a code is issued, it is marked
-            as used in this demo.
+            as USED in this demo.
         </p>
 
     `;
 
 }
 
-// -------------------------
+
+// ========================================
 // PROFILE
-// -------------------------
+// ========================================
 
 function showProfile() {
 
     const box =
         document.getElementById("contentBox");
+
+    if (!box) {
+        return;
+    }
+
 
     box.innerHTML = `
 
@@ -393,44 +544,67 @@ function showProfile() {
 
 }
 
-// -------------------------
-// BASIC HTML ESCAPING
-// -------------------------
+
+// ========================================
+// HTML ESCAPE
+// ========================================
 
 function escapeHTML(value) {
 
     return String(value)
+
         .replace(/&/g, "&amp;")
+
         .replace(/</g, "&lt;")
+
         .replace(/>/g, "&gt;")
+
         .replace(/"/g, "&quot;")
+
         .replace(/'/g, "&#039;");
 
 }
 
-// -------------------------
-// INITIAL PAGE
-// -------------------------
 
-window.addEventListener("load", function() {
+// ========================================
+// START WEBSITE
+// ========================================
 
-    const session =
-        sessionStorage.getItem("LVN_SESSION");
+window.addEventListener(
+    "load",
+    function() {
 
-    if (session === "user") {
+        const session =
+            sessionStorage.getItem(
+                "LVN_SESSION"
+            );
 
-        showPage("dashboardPage");
 
-    } else if (session === "admin") {
+        if (session === "user") {
 
-        showPage("adminPage");
+            showPage(
+                "dashboardPage"
+            );
 
-        refreshCodes();
+        }
 
-    } else {
+        else if (session === "admin") {
 
-        showPage("loginPage");
+            showPage(
+                "adminPage"
+            );
+
+            refreshCodes();
+
+        }
+
+        else {
+
+            showPage(
+                "loginPage"
+            );
+
+        }
 
     }
-
-});
+);
