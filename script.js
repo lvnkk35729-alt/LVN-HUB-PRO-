@@ -1,13 +1,16 @@
 // ========================================
 // LVN.HUB PRO
+// DEMO / LOCAL VERSION
 // ========================================
 
-// DEMO LOGIN DETAILS
+// Demo login details
 const USER_USERNAME = "LVN.HUB";
 const USER_PASSWORD = "LAVAN KOUSHIK 31";
 
 const ADMIN_USERNAME = "LVN.ADMIN";
 const ADMIN_PASSWORD = "LAVANKOUSHIK41";
+
+let licenseTimerInterval = null;
 
 
 // ========================================
@@ -16,17 +19,67 @@ const ADMIN_PASSWORD = "LAVANKOUSHIK41";
 
 function showPage(pageId) {
 
-    const pages = document.querySelectorAll(".page");
-
-    pages.forEach(function(page) {
+    document.querySelectorAll(".page").forEach(function(page) {
         page.classList.add("hidden");
     });
 
-    const selectedPage = document.getElementById(pageId);
+    const page = document.getElementById(pageId);
 
-    if (selectedPage) {
-        selectedPage.classList.remove("hidden");
+    if (page) {
+        page.classList.remove("hidden");
     }
+}
+
+
+// ========================================
+// USER ID
+// ========================================
+
+function getUserId() {
+
+    let userId = localStorage.getItem("LVN_USER_ID");
+
+    if (!userId) {
+
+        userId = Math.floor(
+            100000 + Math.random() * 900000
+        ).toString();
+
+        localStorage.setItem(
+            "LVN_USER_ID",
+            userId
+        );
+    }
+
+    return userId;
+}
+
+
+// ========================================
+// LICENSE STORAGE
+// ========================================
+
+function getLicense() {
+
+    try {
+
+        return JSON.parse(
+            localStorage.getItem("LVN_LICENSE") || "null"
+        );
+
+    } catch (error) {
+
+        return null;
+    }
+}
+
+
+function saveLicense(license) {
+
+    localStorage.setItem(
+        "LVN_LICENSE",
+        JSON.stringify(license)
+    );
 }
 
 
@@ -64,18 +117,19 @@ document
 
             showPage("dashboardPage");
 
+            loadUserDashboard();
+
         } else {
 
             message.textContent =
                 "Invalid username or password.";
-
         }
 
     });
 
 
 // ========================================
-// SHOW ADMIN LOGIN
+// ADMIN LOGIN PAGE
 // ========================================
 
 function showAdminLogin() {
@@ -88,12 +142,11 @@ function showAdminLogin() {
     if (message) {
         message.textContent = "";
     }
-
 }
 
 
 // ========================================
-// BACK TO USER LOGIN
+// USER LOGIN PAGE
 // ========================================
 
 function showUserLogin() {
@@ -106,7 +159,6 @@ function showUserLogin() {
     if (message) {
         message.textContent = "";
     }
-
 }
 
 
@@ -123,8 +175,7 @@ document
         const username =
             document
                 .getElementById("adminUsername")
-                .value
-                .trim();
+                .value.trim();
 
         const password =
             document.getElementById("adminPassword").value;
@@ -147,13 +198,12 @@ document
 
             showPage("adminPage");
 
-            refreshCodes();
+            refreshAdminPanel();
 
         } else {
 
             message.textContent =
                 "Invalid admin username or password.";
-
         }
 
     });
@@ -165,225 +215,512 @@ document
 
 function logout() {
 
-    sessionStorage.removeItem("LVN_SESSION");
-
-    showPage("loginPage");
-
-}
-
-
-// ========================================
-// CODE STORAGE
-// ========================================
-
-function getCodes() {
-
-    try {
-
-        return JSON.parse(
-            localStorage.getItem("LVN_CODES") || "[]"
-        );
-
-    } catch (error) {
-
-        return [];
-
-    }
-
-}
-
-
-function saveCodes(codes) {
-
-    localStorage.setItem(
-        "LVN_CODES",
-        JSON.stringify(codes)
+    sessionStorage.removeItem(
+        "LVN_SESSION"
     );
 
+    if (licenseTimerInterval) {
+        clearInterval(licenseTimerInterval);
+        licenseTimerInterval = null;
+    }
+
+    showPage("loginPage");
 }
 
 
 // ========================================
-// ADMIN - ADD CODE
+// USER DASHBOARD
 // ========================================
 
-function addCode() {
+function loadUserDashboard() {
 
-    const input =
-        document.getElementById("newCode");
+    const userId =
+        getUserId();
 
-    if (!input) {
-        return;
+    const userIdDisplay =
+        document.getElementById("userIdDisplay");
+
+    if (userIdDisplay) {
+        userIdDisplay.textContent =
+            userId;
     }
 
-    const code =
-        input.value.trim();
-
-
-    if (code === "") {
-
-        alert("Please enter a code.");
-
-        return;
-
-    }
-
-
-    const codes = getCodes();
-
-
-    codes.push({
-
-        code: code,
-
-        status: "AVAILABLE",
-
-        createdAt:
-            new Date().toLocaleString()
-
-    });
-
-
-    saveCodes(codes);
-
-    input.value = "";
-
-    refreshCodes();
-
+    updateLicenseDisplay();
 }
 
 
 // ========================================
-// ADMIN - DISPLAY CODES
+// LICENSE DISPLAY
 // ========================================
 
-function refreshCodes() {
+function updateLicenseDisplay() {
+
+    const license =
+        getLicense();
+
+    const status =
+        document.getElementById("licenseStatus");
+
+    const badge =
+        document.getElementById("licenseBadge");
+
+    const keyDisplay =
+        document.getElementById("licenseKeyDisplay");
+
+    const timer =
+        document.getElementById("licenseTimer");
+
+
+    if (!status || !badge || !keyDisplay || !timer) {
+        return;
+    }
+
+
+    if (!license) {
+
+        status.textContent =
+            "NO LICENSE";
+
+        badge.textContent =
+            "INACTIVE";
+
+        keyDisplay.textContent =
+            "NO LICENSE";
+
+        timer.textContent =
+            "--";
+
+        return;
+    }
+
+
+    const remaining =
+        license.expiresAt - Date.now();
+
+
+    if (remaining <= 0) {
+
+        license.status =
+            "EXPIRED";
+
+        saveLicense(license);
+
+
+        status.textContent =
+            "EXPIRED";
+
+        badge.textContent =
+            "EXPIRED";
+
+        keyDisplay.textContent =
+            license.code;
+
+        timer.textContent =
+            "00:00:00";
+
+        if (licenseTimerInterval) {
+            clearInterval(licenseTimerInterval);
+            licenseTimerInterval = null;
+        }
+
+        return;
+    }
+
+
+    status.textContent =
+        "ACTIVE";
+
+    badge.textContent =
+        "ACTIVE";
+
+    keyDisplay.textContent =
+        license.code;
+
+
+    updateLicenseTimer(license.expiresAt);
+
+
+    if (licenseTimerInterval) {
+        clearInterval(licenseTimerInterval);
+    }
+
+
+    licenseTimerInterval =
+        setInterval(function() {
+
+            updateLicenseTimer(
+                license.expiresAt
+            );
+
+        }, 1000);
+}
+
+
+// ========================================
+// LICENSE TIMER
+// ========================================
+
+function updateLicenseTimer(expiresAt) {
+
+    const timer =
+        document.getElementById("licenseTimer");
+
+    if (!timer) {
+        return;
+    }
+
+
+    const remaining =
+        expiresAt - Date.now();
+
+
+    if (remaining <= 0) {
+
+        timer.textContent =
+            "00:00:00";
+
+        updateLicenseDisplay();
+
+        return;
+    }
+
+
+    const totalSeconds =
+        Math.floor(
+            remaining / 1000
+        );
+
+
+    const days =
+        Math.floor(
+            totalSeconds / 86400
+        );
+
+    const hours =
+        Math.floor(
+            (totalSeconds % 86400) / 3600
+        );
+
+    const minutes =
+        Math.floor(
+            (totalSeconds % 3600) / 60
+        );
+
+    const seconds =
+        totalSeconds % 60;
+
+
+    if (days > 0) {
+
+        timer.textContent =
+            `${days}d ${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s`;
+
+    } else {
+
+        timer.textContent =
+            `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+    }
+}
+
+
+function pad(number) {
+
+    return String(number)
+        .padStart(2, "0");
+}
+
+
+// ========================================
+// ADMIN PANEL
+// ========================================
+
+function refreshAdminPanel() {
+
+    displayUserId();
+
+    displayLicense();
+
+    updateUserCount();
+}
+
+
+// ========================================
+// DISPLAY USER
+// ========================================
+
+function displayUserId() {
 
     const list =
-        document.getElementById("codeList");
+        document.getElementById("userIdList");
+
+    const count =
+        document.getElementById("userCount");
 
     if (!list) {
         return;
     }
 
 
-    const codes = getCodes();
+    const userId =
+        getUserId();
 
 
-    if (codes.length === 0) {
+    list.innerHTML = `
 
-        list.innerHTML =
-            "<p>No codes added yet.</p>";
+        <div class="user-item">
 
-        return;
+            <strong>
+                USER ID: ${escapeHTML(userId)}
+            </strong>
 
+            <span>
+                Registered User
+            </span>
+
+        </div>
+
+    `;
+
+
+    if (count) {
+        count.textContent = "1";
     }
-
-
-    list.innerHTML = "";
-
-
-    codes.forEach(function(item, index) {
-
-        const wrapper =
-            document.createElement("div");
-
-        wrapper.className =
-            "code-display";
-
-
-        const codeText =
-            document.createElement("div");
-
-        codeText.textContent =
-            item.code;
-
-
-        const status =
-            document.createElement("small");
-
-        status.textContent =
-            "Status: " + item.status;
-
-
-        const deleteButton =
-            document.createElement("button");
-
-        deleteButton.textContent =
-            "DELETE";
-
-
-        deleteButton.style.background =
-            "#ff405d";
-
-        deleteButton.style.color =
-            "#ffffff";
-
-        deleteButton.style.padding =
-            "10px 15px";
-
-        deleteButton.style.borderRadius =
-            "8px";
-
-        deleteButton.style.marginTop =
-            "12px";
-
-
-        deleteButton.onclick =
-            function() {
-
-                deleteCode(index);
-
-            };
-
-
-        wrapper.appendChild(codeText);
-
-        wrapper.appendChild(status);
-
-        wrapper.appendChild(
-            document.createElement("br")
-        );
-
-        wrapper.appendChild(deleteButton);
-
-        list.appendChild(wrapper);
-
-    });
-
 }
 
 
 // ========================================
-// ADMIN - DELETE CODE
+// USER SEARCH
 // ========================================
 
-function deleteCode(index) {
+function searchUsers() {
 
-    const codes = getCodes();
+    const searchInput =
+        document.getElementById("userSearch");
+
+    const list =
+        document.getElementById("userIdList");
+
+    if (!searchInput || !list) {
+        return;
+    }
+
+
+    const query =
+        searchInput.value.trim();
+
+    const userId =
+        getUserId();
 
 
     if (
-        index < 0 ||
-        index >= codes.length
+        query === "" ||
+        userId.includes(query)
     ) {
 
-        return;
+        list.innerHTML = `
 
+            <div class="user-item">
+
+                <strong>
+                    USER ID: ${escapeHTML(userId)}
+                </strong>
+
+                <span>
+                    Registered User
+                </span>
+
+            </div>
+
+        `;
+
+    } else {
+
+        list.innerHTML =
+            "No matching users found.";
     }
+}
 
 
-    codes.splice(index, 1);
+function updateUserCount() {
 
-    saveCodes(codes);
+    const count =
+        document.getElementById("userCount");
 
-    refreshCodes();
-
+    if (count) {
+        count.textContent = "1";
+    }
 }
 
 
 // ========================================
-// USER - GENERATE CODE
+// SEND LICENSE
+// ========================================
+
+function sendLicense() {
+
+    const userId =
+        document
+            .getElementById("licenseUserId")
+            .value
+            .trim();
+
+    const code =
+        document
+            .getElementById("licenseCode")
+            .value
+            .trim();
+
+    const duration =
+        Number(
+            document
+                .getElementById("licenseDuration")
+                .value
+        );
+
+    const message =
+        document.getElementById("licenseMessage");
+
+
+    if (!/^\d{6}$/.test(userId)) {
+
+        message.textContent =
+            "Enter a valid 6-digit User ID.";
+
+        return;
+    }
+
+
+    if (userId !== getUserId()) {
+
+        message.textContent =
+            "User ID not found in this demo.";
+
+        return;
+    }
+
+
+    if (!code) {
+
+        message.textContent =
+            "Enter a license code.";
+
+        return;
+    }
+
+
+    if (!duration) {
+
+        message.textContent =
+            "Select a license duration.";
+
+        return;
+    }
+
+
+    const license = {
+
+        userId: userId,
+
+        code: code,
+
+        status: "ACTIVE",
+
+        issuedAt: Date.now(),
+
+        expiresAt:
+            Date.now() + duration
+    };
+
+
+    saveLicense(license);
+
+    message.textContent =
+        "License sent successfully.";
+
+    document.getElementById(
+        "licenseCode"
+    ).value = "";
+
+    refreshLicenseList();
+}
+
+
+// ========================================
+// LICENSE LIST
+// ========================================
+
+function refreshLicenseList() {
+
+    const list =
+        document.getElementById("licenseList");
+
+    if (!list) {
+        return;
+    }
+
+
+    const license =
+        getLicense();
+
+
+    if (!license) {
+
+        list.innerHTML =
+            "No licenses found.";
+
+        return;
+    }
+
+
+    const expired =
+        license.expiresAt <= Date.now();
+
+
+    const status =
+        expired
+            ? "EXPIRED"
+            : "ACTIVE";
+
+
+    list.innerHTML = `
+
+        <div class="license-item">
+
+            <div>
+
+                <strong>
+                    ${escapeHTML(license.code)}
+                </strong>
+
+                <p>
+                    User ID:
+                    ${escapeHTML(license.userId)}
+                </p>
+
+            </div>
+
+            <strong>
+                ${status}
+            </strong>
+
+        </div>
+
+    `;
+}
+
+
+// ========================================
+// ADMIN LICENSE DISPLAY
+// ========================================
+
+function displayLicense() {
+
+    refreshLicenseList();
+}
+
+
+// ========================================
+// GENERATE / GET CODE
 // ========================================
 
 function generateCode() {
@@ -396,61 +733,61 @@ function generateCode() {
     }
 
 
-    const codes = getCodes();
+    const license =
+        getLicense();
 
 
-    const availableCode =
-        codes.find(function(item) {
-
-            return item.status === "AVAILABLE";
-
-        });
-
-
-    if (!availableCode) {
+    if (!license) {
 
         box.innerHTML = `
 
-            <h2>🔒 No Code Available</h2>
+            <h2>🔒 License Required</h2>
 
             <p>
-                No administrator-provided code
-                is currently available.
+                You do not currently have
+                an active administrator-issued
+                license.
             </p>
 
         `;
 
         return;
-
     }
 
 
-    // Mark the selected code as USED.
+    if (license.expiresAt <= Date.now()) {
 
-    availableCode.status =
-        "USED";
+        box.innerHTML = `
 
-    availableCode.usedAt =
-        new Date().toLocaleString();
+            <h2>⏰ License Expired</h2>
 
+            <p>
+                Your license has expired.
+                Please contact the administrator.
+            </p>
 
-    saveCodes(codes);
+        `;
+
+        updateLicenseDisplay();
+
+        return;
+    }
 
 
     box.innerHTML = `
 
-        <h2>🔑 Your Code</h2>
+        <h2>🔑 Access Code</h2>
 
         <div class="code-display">
-            ${escapeHTML(availableCode.code)}
+            ${escapeHTML(license.code)}
         </div>
 
         <p>
-            This code has been marked as USED.
+            This is the administrator-provided
+            access code assigned to your account.
         </p>
 
     `;
-
 }
 
 
@@ -473,30 +810,27 @@ function showUse() {
         <h2>📖 What's the Use?</h2>
 
         <p>
-            LVN.HUB PRO uses
-            administrator-managed access codes
-            for controlled access to your own
-            services, projects, or cybersecurity
-            learning resources.
+            LVN.HUB PRO is a managed-access
+            portal for your own projects,
+            learning resources and services.
         </p>
 
         <br>
 
         <p>
-            Codes are manually added by the
-            administrator and are not randomly
-            generated.
+            Administrators can assign
+            time-limited license codes
+            to registered users.
         </p>
 
         <br>
 
         <p>
-            Once a code is issued, it is marked
-            as USED in this demo.
+            When the license expires,
+            access is shown as expired.
         </p>
 
     `;
-
 }
 
 
@@ -520,7 +854,12 @@ function showProfile() {
 
         <p>
             <strong>Username:</strong>
-            LVN.HUB
+            ${escapeHTML(USER_USERNAME)}
+        </p>
+
+        <p>
+            <strong>User ID:</strong>
+            ${escapeHTML(getUserId())}
         </p>
 
         <p>
@@ -533,15 +872,7 @@ function showProfile() {
             LVN.HUB PRO
         </p>
 
-        <br>
-
-        <p>
-            Cybersecurity learning and
-            administrator-managed code portal.
-        </p>
-
     `;
-
 }
 
 
@@ -552,17 +883,11 @@ function showProfile() {
 function escapeHTML(value) {
 
     return String(value)
-
         .replace(/&/g, "&amp;")
-
         .replace(/</g, "&lt;")
-
         .replace(/>/g, "&gt;")
-
         .replace(/"/g, "&quot;")
-
         .replace(/'/g, "&#039;");
-
 }
 
 
@@ -586,6 +911,8 @@ window.addEventListener(
                 "dashboardPage"
             );
 
+            loadUserDashboard();
+
         }
 
         else if (session === "admin") {
@@ -594,7 +921,7 @@ window.addEventListener(
                 "adminPage"
             );
 
-            refreshCodes();
+            refreshAdminPanel();
 
         }
 
@@ -603,7 +930,6 @@ window.addEventListener(
             showPage(
                 "loginPage"
             );
-
         }
 
     }
