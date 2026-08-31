@@ -1,223 +1,476 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>LVN.HUB PRO</title>
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LVN.HUB PRO</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <!-- LOGIN PAGE -->
-  <div id="loginPage" class="page">
+<!-- ================= USER LOGIN ================= -->
+
+<section id="loginPage" class="page">
+
     <div class="login-box">
 
-      <div class="logo">LVN.HUB</div>
-      <p class="subtitle">SECURE ACCESS</p>
+        <div class="logo">LVN.HUB</div>
+        <p class="subtitle">SECURE ACCESS</p>
 
-      <form id="loginForm">
+        <form id="loginForm">
 
-        <input
-          type="text"
-          id="username"
-          placeholder="Username"
-          autocomplete="username"
-          required
+            <input
+                id="username"
+                type="text"
+                placeholder="Username"
+                autocomplete="username"
+                required
+            >
+
+            <input
+                id="password"
+                type="password"
+                placeholder="Password"
+                autocomplete="current-password"
+                required
+            >
+
+            <button type="submit">LOGIN</button>
+
+            <p id="loginMessage"></p>
+
+        </form>
+
+        <button
+            type="button"
+            class="admin-link"
+            onclick="showAdminLogin()"
         >
-
-        <input
-          type="password"
-          id="password"
-          placeholder="Password"
-          autocomplete="current-password"
-          required
-        >
-
-        <button type="submit">LOGIN</button>
-
-        <p id="loginMessage"></p>
-
-      </form>
-
-      <button class="admin-link" onclick="showAdminLogin()">
-        ADMIN PANEL
-      </button>
+            ADMIN PANEL
+        </button>
 
     </div>
-  </div>
+
+</section>
 
 
-  <!-- USER DASHBOARD -->
-  <div id="dashboardPage" class="page hidden">
+<!-- ================= USER DASHBOARD ================= -->
+
+<section id="dashboardPage" class="page hidden">
 
     <header>
-      <div class="brand">LVN.HUB PRO</div>
 
-      <button onclick="logout()" class="logout">
-        LOGOUT
-      </button>
+        <div class="brand">
+            LVN.HUB PRO
+        </div>
+
+        <button
+            type="button"
+            class="logout"
+            onclick="logout()"
+        >
+            LOGOUT
+        </button>
+
     </header>
+
 
     <main class="dashboard">
 
-      <h1>Welcome to <span>LVN.HUB</span></h1>
-      <p class="description">
-        Premium cybersecurity learning & code management portal.
-      </p>
+        <div class="welcome-section">
 
-      <div class="cards">
+            <h1>
+                Welcome to <span>LVN.HUB</span>
+            </h1>
 
-        <div class="card">
-          <div class="icon">🔑</div>
-          <h2>Generate Codes</h2>
-          <p>
-            Get an available code provided by the administrator.
-          </p>
-          <button onclick="generateCode()">
-            GENERATE CODE
-          </button>
+            <p class="description">
+                Premium cybersecurity learning
+                & code management portal.
+            </p>
+
         </div>
 
-        <div class="card">
-          <div class="icon">📖</div>
-          <h2>What's the Use?</h2>
-          <p>
-            Learn about the purpose of managed access codes.
-          </p>
-          <button onclick="showUse()">
-            LEARN MORE
-          </button>
+
+        <!-- USER ID -->
+
+        <div class="user-id-card">
+
+            <div>
+                <small>YOUR USER ID</small>
+
+                <h2 id="userIdDisplay">
+                    ------
+                </h2>
+            </div>
+
+            <div class="id-icon">
+                🆔
+            </div>
+
         </div>
 
-        <div class="card">
-          <div class="icon">👤</div>
-          <h2>Profile</h2>
-          <p>
-            View your LVN.HUB profile information.
-          </p>
-          <button onclick="showProfile()">
-            VIEW PROFILE
-          </button>
+
+        <!-- LICENSE STATUS -->
+
+        <div class="license-card">
+
+            <div class="license-header">
+
+                <div>
+                    <small>LICENSE STATUS</small>
+
+                    <h2 id="licenseStatus">
+                        NO LICENSE
+                    </h2>
+                </div>
+
+                <div id="licenseBadge"
+                     class="license-badge">
+                    INACTIVE
+                </div>
+
+            </div>
+
+
+            <div class="license-code">
+                <small>LICENSE KEY</small>
+
+                <div id="licenseKeyDisplay">
+                    NO LICENSE
+                </div>
+            </div>
+
+
+            <div class="license-timer">
+
+                <small>TIME REMAINING</small>
+
+                <strong id="licenseTimer">
+                    --
+                </strong>
+
+            </div>
+
         </div>
 
-      </div>
 
-      <div id="contentBox"></div>
+        <!-- OPTIONS -->
+
+        <div class="cards">
+
+
+            <!-- GENERATE CODE -->
+
+            <div class="card premium-card">
+
+                <div class="icon">
+                    🔑
+                </div>
+
+                <h2>
+                    Generate Codes
+                </h2>
+
+                <p>
+                    Get an available administrator-provided
+                    access code.
+                </p>
+
+                <button
+                    type="button"
+                    onclick="generateCode()"
+                >
+                    GENERATE CODE
+                </button>
+
+            </div>
+
+
+            <!-- USE -->
+
+            <div class="card">
+
+                <div class="icon">
+                    📖
+                </div>
+
+                <h2>
+                    What's the Use?
+                </h2>
+
+                <p>
+                    Learn about managed access
+                    and license codes.
+                </p>
+
+                <button
+                    type="button"
+                    onclick="showUse()"
+                >
+                    LEARN MORE
+                </button>
+
+            </div>
+
+
+            <!-- PROFILE -->
+
+            <div class="card">
+
+                <div class="icon">
+                    👤
+                </div>
+
+                <h2>
+                    Profile
+                </h2>
+
+                <p>
+                    View your LVN.HUB account
+                    information.
+                </p>
+
+                <button
+                    type="button"
+                    onclick="showProfile()"
+                >
+                    VIEW PROFILE
+                </button>
+
+            </div>
+
+
+        </div>
+
+
+        <div id="contentBox"></div>
 
     </main>
 
-  </div>
+</section>
 
 
-  <!-- ADMIN LOGIN -->
-  <div id="adminLoginPage" class="page hidden">
+<!-- ================= ADMIN LOGIN ================= -->
+
+<section id="adminLoginPage" class="page hidden">
 
     <div class="login-box">
 
-      <div class="logo">LVN.ADMIN</div>
-      <p class="subtitle">ADMIN CONTROL PANEL</p>
+        <div class="logo">
+            LVN.ADMIN
+        </div>
 
-      <form id="adminForm">
+        <p class="subtitle">
+            ADMIN CONTROL PANEL
+        </p>
 
-        <input
-          type="text"
+        <form id="adminForm">
 
-  id="adminUsername"
-placeholder="Admin Username"
-autocomplete="username"
-required
->
+            <input
+                id="adminUsername"
+                type="text"
+                placeholder="Admin Username"
+                autocomplete="username"
+                required
+            >
 
-<input
-  id="adminPassword"
-  type="password"
-  placeholder="Admin Password"
-  autocomplete="current-password"
-  required
->
+            <input
+                id="adminPassword"
+                type="password"
+                placeholder="Admin Password"
+                autocomplete="current-password"
+                required
+            >
 
-<button type="submit">ADMIN LOGIN</button>
+            <button type="submit">
+                ADMIN LOGIN
+            </button>
 
-<p id="adminMessage"></p>
+            <p id="adminMessage"></p>
 
-</form>
+        </form>
 
-<button
-  class="admin-link"
-  onclick="showUserLogin()"
->
-  BACK TO USER LOGIN
-</button>
+        <button
+            type="button"
+            class="admin-link"
+            onclick="showUserLogin()"
+        >
+            BACK TO USER LOGIN
+        </button>
 
-</div>
-</div>
-
-
-<!-- ADMIN DASHBOARD -->
-
-<div id="adminPage" class="page hidden">
-
-<header>
-
-  <div class="brand">
-    LVN.ADMIN
-  </div>
-
-  <button
-    onclick="logout()"
-    class="logout"
-  >
-    LOGOUT
-  </button>
-
-</header>
-
-<main class="dashboard">
-
-  <h1>
-    Admin <span>Dashboard</span>
-  </h1>
-
-  <p class="description">
-    Manage administrator-provided access codes.
-  </p>
-
-  <div class="admin-panel">
-
-    <h2>➕ Add New Code</h2>
-
-    <input
-      id="newCode"
-      type="text"
-      placeholder="Enter access code"
-    >
-
-    <button onclick="addCode()">
-      ADD CODE
-    </button>
-
-  </div>
-
-  <div class="admin-panel">
-
-    <h2>📋 Code Management</h2>
-
-    <div id="codeList">
-      No codes added yet.
     </div>
 
-  </div>
+</section>
 
-</main>
 
-</div>
+<!-- ================= ADMIN DASHBOARD ================= -->
 
+<section id="adminPage" class="page hidden">
+
+    <header>
+
+        <div class="brand">
+            LVN.ADMIN
+        </div>
+
+        <button
+            type="button"
+            class="logout"
+            onclick="logout()"
+        >
+            LOGOUT
+        </button>
+
+    </header>
+
+
+    <main class="dashboard">
+
+        <h1>
+            Admin <span>Dashboard</span>
+        </h1>
+
+        <p class="description">
+            Manage users, access codes and licenses.
+        </p>
+
+
+        <!-- VIEW USER IDS -->
+
+        <div class="admin-panel">
+
+            <div class="panel-title">
+
+                <div>
+                    <h2>👥 User IDs</h2>
+
+                    <p>
+                        Search registered user IDs.
+                    </p>
+                </div>
+
+                <strong id="userCount">
+                    0
+                </strong>
+
+            </div>
+
+
+            <input
+                id="userSearch"
+                type="search"
+                placeholder="🔍 Search 6-digit User ID"
+                oninput="searchUsers()"
+                autocomplete="off"
+            >
+
+
+            <div id="userIdList">
+                No users found.
+            </div>
+
+        </div>
+
+
+        <!-- SEND LICENSE -->
+
+        <div class="admin-panel">
+
+            <h2>
+                📤 Send License
+            </h2>
+
+            <p class="panel-description">
+                Assign a license code to a User ID.
+            </p>
+
+
+            <input
+                id="licenseUserId"
+                type="text"
+                inputmode="numeric"
+                maxlength="6"
+                placeholder="Enter 6-digit User ID"
+                autocomplete="off"
+            >
+
+
+            <input
+                id="licenseCode"
+                type="text"
+                placeholder="Enter License Code"
+                autocomplete="off"
+            >
+
+
+            <select id="licenseDuration">
+
+                <option value="3600000">
+                    1 Hour
+                </option>
+
+                <option value="86400000">
+                    1 Day
+                </option>
+
+                <option value="604800000">
+                    7 Days
+                </option>
+
+                <option value="2592000000">
+                    30 Days
+                </option>
+
+            </select>
+
+
+            <button
+                type="button"
+                onclick="sendLicense()"
+            >
+                SEND LICENSE
+            </button>
+
+
+            <p id="licenseMessage"></p>
+
+        </div>
+
+
+        <!-- LICENSE LIST -->
+
+        <div class="admin-panel">
+
+            <div class="panel-title">
+
+                <div>
+                    <h2>
+                        📋 License Management
+                    </h2>
+
+                    <p>
+                        View active and expired licenses.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div id="licenseList">
+                No licenses found.
+            </div>
+
+        </div>
+
+    </main>
+
+</section>
+
+
+<!-- ================= JAVASCRIPT ================= -->
 
 <script src="script.js"></script>
 
 </body>
-  </html>
+              </html>
