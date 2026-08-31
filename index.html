@@ -125,4 +125,99 @@
 
         <input
           type="text"
-        
+
+  id="adminUsername"
+placeholder="Admin Username"
+autocomplete="username"
+required
+>
+
+<input
+  id="adminPassword"
+  type="password"
+  placeholder="Admin Password"
+  autocomplete="current-password"
+  required
+>
+
+<button type="submit">ADMIN LOGIN</button>
+
+<p id="adminMessage"></p>
+
+</form>
+
+<button
+  class="admin-link"
+  onclick="showUserLogin()"
+>
+  BACK TO USER LOGIN
+</button>
+
+</div>
+</div>
+
+
+<!-- ADMIN DASHBOARD -->
+
+<div id="adminPage" class="page hidden">
+
+<header>
+
+  <div class="brand">
+    LVN.ADMIN
+  </div>
+
+  <button
+    onclick="logout()"
+    class="logout"
+  >
+    LOGOUT
+  </button>
+
+</header>
+
+<main class="dashboard">
+
+  <h1>
+    Admin <span>Dashboard</span>
+  </h1>
+
+  <p class="description">
+    Manage administrator-provided access codes.
+  </p>
+
+  <div class="admin-panel">
+
+    <h2>➕ Add New Code</h2>
+
+    <input
+      id="newCode"
+      type="text"
+      placeholder="Enter access code"
+    >
+
+    <button onclick="addCode()">
+      ADD CODE
+    </button>
+
+  </div>
+
+  <div class="admin-panel">
+
+    <h2>📋 Code Management</h2>
+
+    <div id="codeList">
+      No codes added yet.
+    </div>
+
+  </div>
+
+</main>
+
+</div>
+
+
+<script src="script.js"></script>
+
+</body>
+  </html>
