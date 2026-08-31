@@ -1,1 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <title>LVN.HUB PRO</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- LOGIN PAGE -->
+  <div id="loginPage" class="page">
+    <div class="login-box">
+
+      <div class="logo">LVN.HUB</div>
+      <p class="subtitle">SECURE ACCESS</p>
+
+      <form id="loginForm">
+
+        <input
+          type="text"
+          id="username"
+          placeholder="Username"
+          autocomplete="username"
+          required
+        >
+
+        <input
+          type="password"
+          id="password"
+          placeholder="Password"
+          autocomplete="current-password"
+          required
+        >
+
+        <button type="submit">LOGIN</button>
+
+        <p id="loginMessage"></p>
+
+      </form>
+
+      <button class="admin-link" onclick="showAdminLogin()">
+        ADMIN PANEL
+      </button>
+
+    </div>
+  </div>
+
+
+  <!-- USER DASHBOARD -->
+  <div id="dashboardPage" class="page hidden">
+
+    <header>
+      <div class="brand">LVN.HUB PRO</div>
+
+      <button onclick="logout()" class="logout">
+        LOGOUT
+      </button>
+    </header>
+
+    <main class="dashboard">
+
+      <h1>Welcome to <span>LVN.HUB</span></h1>
+      <p class="description">
+        Premium cybersecurity learning & code management portal.
+      </p>
+
+      <div class="cards">
+
+        <div class="card">
+          <div class="icon">🔑</div>
+          <h2>Generate Codes</h2>
+          <p>
+            Get an available code provided by the administrator.
+          </p>
+          <button onclick="generateCode()">
+            GENERATE CODE
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="icon">📖</div>
+          <h2>What's the Use?</h2>
+          <p>
+            Learn about the purpose of managed access codes.
+          </p>
+          <button onclick="showUse()">
+            LEARN MORE
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="icon">👤</div>
+          <h2>Profile</h2>
+          <p>
+            View your LVN.HUB profile information.
+          </p>
+          <button onclick="showProfile()">
+            VIEW PROFILE
+          </button>
+        </div>
+
+      </div>
+
+      <div id="contentBox"></div>
+
+    </main>
+
+  </div>
+
+
+  <!-- ADMIN LOGIN -->
+  <div id="adminLoginPage" class="page hidden">
+
+    <div class="login-box">
+
+      <div class="logo">LVN.ADMIN</div>
+      <p class="subtitle">ADMIN CONTROL PANEL</p>
+
+      <form id="adminForm">
+
+        <input
+          type="text"
+        
